@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>App Store</title>
+    <style>
+        :root { 
+            --ios-blue: #007AFF; 
+            --ios-gray: #8E8E93; 
+            --ios-light-gray: #F2F2F7;
+            --ios-memo-yellow: #FFD60A;
+            --error-red: #ff3b30; 
+            --clear-green: #4cd964; 
+        }
+        
+        body, html { 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif; 
+            background: #fff; overflow: hidden; user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        .apply-shake { animation: shake 0.15s ease-in-out 0s 2; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* 1단계: App Store */
+        #app-store { display: flex; flex-direction: column; padding: 25px; animation: fadeIn 0.5s; }
+        .app-header { display: flex; gap: 15px; align-items: center; margin-bottom: 25px; }
+        .app-icon-big { width: 100px; height: 100px; border-radius: 22px; background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%); display: flex; align-items: center; justify-content: center; font-size: 50px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+        .install-btn { background: var(--ios-blue); color: white; padding: 6px 24px; border-radius: 20px; font-weight: 700; border: none; font-size: 14px; cursor: pointer; }
+        .progress-container { width: 100%; height: 4px; background: var(--ios-light-gray); border-radius: 2px; margin-top: 15px; display: none; overflow: hidden; }
+        .progress-bar { width: 0%; height: 100%; background: var(--ios-blue); transition: width 0.4s ease; }
+
+        /* 2단계: 암호 입력 */
+        #pass-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .pass-modal { width: 85%; max-width: 300px; background: #fff; border-radius: 14px; padding: 20px; text-align: center; }
+        #pw-input { width: 90%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 18px; text-align: center; margin: 15px 0; outline: none; }
+
+        /* 3단계: 홈 화면 */
+        #home-screen { display: none; width: 100%; height: 100%; background: url('https://images.unsplash.com/photo-1557683316-973673baf926') center/cover; position: relative; }
+        .installed-app { display: flex; flex-direction: column; align-items: center; position: absolute; top: 60px; left: 30px; }
+        .app-icon-small { width: 60px; height: 60px; border-radius: 12px; background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%); display: flex; align-items: center; justify-content: center; font-size: 35px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); overflow: hidden; }
+        .app-name { color: white; font-size: 12px; margin-top: 6px; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
+
+        /* 4단계: 관리자 모드 미션 */
+        #admin-mode { display: none; width: 100%; height: 100%; background: #111; color: #0f0; font-family: monospace; padding: 40px 20px; flex-direction: column; overflow-y: auto; }
+        .error-item { margin: 15px 0; border-left: 3px solid var(--error-red); padding-left: 10px; cursor: pointer; }
+        .resolved { border-left-color: var(--clear-green); opacity: 0.5; }
+
+        /* 퀴즈 공통 */
+        .quiz-app { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; z-index: 500; flex-direction: column; animation: fadeIn 0.3s; }
+        .quiz-header { padding: 45px 20px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 0.5px solid #ddd; }
+        .quiz-content { flex: 1; overflow-y: auto; padding: 20px; }
+        .quiz-input-group { padding: 20px; border-top: 0.5px solid #ddd; background: #f9f9f9; display: flex; gap: 10px; padding-bottom: 40px; }
+        .quiz-input { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 10px; font-size: 16px; outline: none; }
+        .submit-btn { background: var(--ios-blue); color: white; border: none; padding: 10px 20px; border-radius: 10px; font-weight: 700; }
+
+        /* 5단계: 케이크 미션 */
+        #cake-stage { display: none; width: 100%; height: 100%; background: #fff; position: relative; overflow: hidden; }
+        #runaway-cake { position: absolute; font-size: 60px; z-index: 10; transition: all 0.2s; top: 50%; left: 50%; transform: translate(-50%, -50%); cursor: pointer; }
+        #secret-letter { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; background: #fff9c4; padding: 30px; border-radius: 15px; z-index: 1000; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+
+        /* 알림창 */
+        #alert-box { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 270px; background: rgba(255,255,255,0.95); backdrop-filter: blur(15px); border-radius: 13px; z-index: 2000; overflow: hidden; }
+        .alert-btn { width: 100%; border: none; border-top: 0.5px solid #ccc; padding: 12px; color: var(--ios-blue); font-size: 17px; font-weight: 600; background: transparent; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div id="app-store">
+        <div class="app-header">
+            <div class="app-icon-big">🎁</div>
+            <div class="app-info">
+                <div style="font-size:22px; font-weight:700;">HAPPY B-DAY 앱</div>
+                <div style="color:var(--ios-gray); font-size:14px;">Developer: 준영</div>
+                <div style="margin-top: 12px;"><button class="install-btn" id="main-install-btn" onclick="openPassScreen()">받기</button></div>
+            </div>
+        </div>
+        <div class="progress-container" id="progress-wrap"><div class="progress-bar" id="progress-bar"></div></div>
+        <p id="install-logs" style="font-size: 12px; color: var(--ios-gray); margin-top: 8px; height: 15px;"></p>
+        <hr style="width:100%; border:0; border-top:0.5px solid #ddd; margin:20px 0;">
+        <div style="font-size:14px; line-height:1.6;"><strong>새로운 기능</strong><br><span style="color:var(--ios-gray)">버전 26.04.02</span><br>• 생일 기념 긴급 보안 패치</div>
+    </div>
+
+    <div id="pass-screen">
+        <div class="pass-modal" id="modal-content">
+            <div style="font-weight:700;">Apple ID 암호</div>
+            <input type="tel" id="pw-input" maxlength="6" placeholder="YYMMDD">
+            <div style="display:flex; border-top: 0.5px solid #ccc; margin-top:10px;">
+                <button onclick="closePassScreen()" style="flex:1; border:none; background:none; padding:12px; color:var(--ios-blue);">취소</button>
+                <button onclick="checkPassword()" style="flex:1; border:none; background:none; padding:12px; color:var(--ios-blue); font-weight:700; border-left:0.5px solid #ccc;">확인</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="home-screen">
+        <div class="installed-app" onclick="showInitialAlert()">
+            <div class="app-icon-small">🎁</div>
+            <div class="app-name">생일축하</div>
+        </div>
+    </div>
+
+    <div id="admin-mode">
+        <div id="err1" class="error-item" onclick="openQuiz(1)">> ERR: TOO_Cute_Index</div>
+        <div id="err2" class="error-item" onclick="openQuiz(2)">> ERR: Everyday_is_Sync</div>
+        <div id="err3" class="error-item" onclick="openQuiz(3)">> ERR: Your_Day_Loop</div>
+        <div id="err4" class="error-item" onclick="openQuiz(4)">> ERR: From_Auth</div>
+    </div>
+
+    <div id="quiz-app-1" class="quiz-app">
+        <div class="quiz-header"><span style="font-weight:700; font-size:22px;">사진</span></div>
+        <div class="quiz-content" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; text-align:center;">
+            <div><div class="photo-box" style="background:#f2f2f7; aspect-ratio:1; border-radius:8px; margin-bottom:5px; display:flex; justify-content:center; align-items:center; overflow:hidden;">사진1</div><div style="font-size:11px; color:#555;">img_S.jpg</div></div>
+            <div><div class="photo-box" style="background:#f2f2f7; aspect-ratio:1; border-radius:8px; margin-bottom:5px; display:flex; justify-content:center; align-items:center; overflow:hidden;">사진2</div><div style="font-size:11px; color:#555;">date_E.png</div></div>
+            <div><div class="photo-box" style="background:#f2f2f7; aspect-ratio:1; border-radius:8px; margin-bottom:5px; display:flex; justify-content:center; align-items:center; overflow:hidden;">사진3</div><div style="font-size:11px; color:#555;">snap_O.gif</div></div>
+            <div><div class="photo-box" style="background:#f2f2f7; aspect-ratio:1; border-radius:8px; margin-bottom:5px; display:flex; justify-content:center; align-items:center; overflow:hidden;">사진4</div><div style="font-size:11px; color:#555;">file_N.webp</div></div>
+            <div><div class="photo-box" style="background:#f2f2f7; aspect-ratio:1; border-radius:8px; margin-bottom:5px; display:flex; justify-content:center; align-items:center; overflow:hidden;">사진5</div><div style="font-size:11px; color:#555;">pic_A.heic</div></div>
+        </div>
+        <div class="quiz-input-group"><input type="text" id="q-input-1" class="quiz-input" placeholder="정답을 입력하세요"><button class="submit-btn" onclick="checkQuiz(1, 'SEONA')">인증</button></div>
+    </div>
+
+    <div id="quiz-app-2" class="quiz-app">
+        <div class="quiz-header"><span style="color:var(--ios-memo-yellow); font-weight:bold;">〈 메모</span></div>
+        <div class="quiz-content">
+            <b>????? : 72-65-80-80-89</b><br><br>
+            <div style="font-size:12px; line-height:1.8; background:#f9f9f9; padding:15px; border-radius:10px; letter-spacing:-0.5px;">
+                65:A &nbsp; 66:B &nbsp; 67:C &nbsp; 68:D &nbsp; 69:E<br>
+                70:F &nbsp; 71:G &nbsp; 72:H &nbsp; 73:I &nbsp; 74:J<br>
+                75:K &nbsp; 76:L &nbsp; 77:M &nbsp; 78:N &nbsp; 79:O<br>
+                80:P &nbsp; 81:Q &nbsp; 82:R &nbsp; 83:S &nbsp; 84:T<br>
+                85:U &nbsp; 86:V &nbsp; 87:W &nbsp; 88:X &nbsp; 89:Y<br>
+                90:Z
+            </div>
+        </div>
+        <div class="quiz-input-group"><input type="text" id="q-input-2" class="quiz-input" placeholder="정답을 입력하세요"><button class="submit-btn" onclick="checkQuiz(2, 'HAPPY')">인증</button></div>
+    </div>
+
+    <div id="quiz-app-3" class="quiz-app">
+        <div class="quiz-header"><span style="font-weight:700;">Dino Game</span></div>
+        <div class="quiz-content" onclick="dinoJump()" style="background:#f7f7f7;"><canvas id="dino-canvas"></canvas></div>
+        <div class="quiz-input-group"><input type="text" id="q-input-3" class="quiz-input" placeholder="정답을 입력하세요"><button class="submit-btn" onclick="checkQuiz(3, 'BIRTHDAY')">인증</button></div>
+    </div>
+
+    <div id="quiz-app-4" class="quiz-app">
+        <div class="quiz-header"><span>최종 인증</span></div>
+        <div class="quiz-content" style="display:flex; justify-content:center; align-items:center;">이 앱을 만든 사람의 이름은?</div>
+        <div class="quiz-input-group"><input type="text" id="q-input-4" class="quiz-input" placeholder="이름"><button class="submit-btn" onclick="checkQuiz(4, '준영')">인증</button></div>
+    </div>
+
+    <div id="cake-stage">
+        <div onclick="handleEasterEgg()" style="position:absolute; top:0; left:0; width:100px; height:100px; z-index:100;"></div>
+        <div id="runaway-cake" onmouseover="moveCake()" ontouchstart="moveCake()" onclick="catchCake()">🎂</div>
+        <div id="cake-hint" style="display:none; position:absolute; bottom:30px; left:0; width:100%; text-align:center; font-size:14px; color:var(--ios-gray); pointer-events:none;">힌트 : 도움이 필요하신가요?<br>010-0000-0000 으로 연락주세요</div>
+        <div id="secret-letter"><p>자기야 💌<br>생일축하해!<br>재미있었다면 좋겠어 ㅎㅎ<b>지금 고개를 들어 앞을 봐줘!</b></p></div>
+    </div>
+
+    <div id="alert-box">
+        <div id="alert-msg" style="padding:22px; font-size:15px; text-align:center;"></div>
+        <button class="alert-btn" id="alert-confirm-btn">확인</button>
+    </div>
+
+    <script>
+        const logs = ["패키지 분해 중...", "강선아 예쁨 감지 완료", "귀여움 인증 중...", "설치 완료!"];
+        let solved = [false, false, false, false];
+        let cakeEscapes = 0, eggClick = 0, lastClick = 0;
+        let isGameOver = false;
+
+        function openPassScreen() { document.getElementById('pass-screen').style.display = 'flex'; }
+        function closePassScreen() { document.getElementById('pass-screen').style.display = 'none'; }
+        function checkPassword() {
+            if (document.getElementById('pw-input').value === '260402') { closePassScreen(); startInstall(); }
+            else { document.getElementById('modal-content').classList.add('apply-shake'); setTimeout(()=>document.getElementById('modal-content').classList.remove('apply-shake'),400); }
+        }
+        function startInstall() {
+            const btn = document.getElementById('main-install-btn');
+            document.getElementById('progress-wrap').style.display = 'block';
+            btn.innerText = "설치 중...";
+            let i = 0;
+            const inv = setInterval(() => {
+                document.getElementById('install-logs').innerText = logs[i];
+                document.getElementById('progress-bar').style.width = ((i+1)/logs.length)*100 + "%";
+                i++;
+                if(i >= logs.length) { clearInterval(inv); setTimeout(()=>{ document.getElementById('app-store').style.display='none'; document.getElementById('home-screen').style.display='block'; }, 800); }
+            }, 800);
+        }
+        function openAlert(msg, cb) { document.getElementById('alert-msg').innerHTML = msg; document.getElementById('alert-box').style.display='block'; document.getElementById('alert-confirm-btn').onclick=()=>{ document.getElementById('alert-box').style.display='none'; if(cb) cb(); }; }
+        function showInitialAlert() { openAlert("!오류발생!<br>관리자 모드 복구가 필요합니다.", () => { document.getElementById('home-screen').style.display='none'; document.getElementById('admin-mode').style.display='flex'; }); }
+        function openQuiz(n) { if(solved[n-1]) return; document.getElementById(`quiz-app-${n}`).style.display='flex'; if(n===3) startDinoGame(); }
+        function checkQuiz(n, ans) {
+            if(document.getElementById(`q-input-${n}`).value.trim().toUpperCase() === ans) {
+                solved[n-1] = true; document.getElementById(`quiz-app-${n}`).style.display='none';
+                document.getElementById(`err${n}`).classList.add('resolved');
+                if(solved.every(v=>v)) openAlert("To. 선아<br>happy birthday!<br>from. 준영", () => { openAlert("복구 완료!", ()=>{ document.getElementById('admin-mode').style.display='none'; document.getElementById('cake-stage').style.display='block'; }); });
+            } else alert("다시 확인해 주세요.");
+        }
+        
+        let dinoY=130, dinoV=0, obstacles=[], gameTimer;
+        function startDinoGame() {
+            const cvs = document.getElementById('dino-canvas'); cvs.width = cvs.parentElement.clientWidth; cvs.height=150;
+            const ctx = cvs.getContext('2d'); obstacles=[]; let f=0, wIdx=0; const target="BIRTHDAY";
+            isGameOver = false; dinoY = 130; dinoV = 0;
+            clearInterval(gameTimer);
+            gameTimer = setInterval(() => {
+                ctx.clearRect(0,0,cvs.width,cvs.height);
+                dinoV += 0.8; dinoY += dinoV; if(dinoY>130){dinoY=130; dinoV=0;}
+                
+                // 공룡을 좌우 반전시켜서 그리기 (진행방향 보기)
+                ctx.save();
+                ctx.translate(35, dinoY);
+                ctx.scale(-1, 1);
+                ctx.font="30px Arial"; 
+                ctx.fillText("🦖", -15, 0);
+                ctx.restore();
+
+                if(f%90===0 && wIdx<target.length) { obstacles.push({x:cvs.width, char:target[wIdx]}); wIdx++; }
+                obstacles.forEach(o=>{ 
+                    o.x-=5; 
+                    ctx.font="24px Arial"; ctx.fillText("🌵", o.x, 130); 
+                    ctx.font="16px Arial"; ctx.fillStyle="red"; ctx.fillText(o.char, o.x+5, 100); ctx.fillStyle="black"; 
+                    
+                    // 충돌 판정 (공룡이 선인장에 닿았을 때)
+                    if(o.x < 45 && o.x + 20 > 20 && dinoY > 106) {
+                        clearInterval(gameTimer);
+                        isGameOver = true;
+                        ctx.fillStyle = "rgba(0,0,0,0.4)";
+                        ctx.fillRect(0, 0, cvs.width, cvs.height);
+                        ctx.fillStyle = "black";
+                        ctx.font = "bold 20px Arial";
+                        ctx.textAlign = "center";
+                        ctx.fillText("Game Over", cvs.width/2, 60);
+                        ctx.font = "14px Arial";
+                        ctx.fillText("화면을 터치해 재시작", cvs.width/2, 90);
+                        ctx.textAlign = "left";
+                    }
+                });
+                f++;
+            }, 20);
+        }
+        function dinoJump() { 
+            if(isGameOver) { startDinoGame(); return; }
+            if(dinoY===130) dinoV=-12; 
+        }
+        
+        function moveCake() { 
+            if(cakeEscapes>=15) return; 
+            document.getElementById('runaway-cake').style.left=Math.random()*(window.innerWidth-80)+'px'; 
+            document.getElementById('runaway-cake').style.top=Math.random()*(window.innerHeight-80)+'px'; 
+            cakeEscapes++; 
+            if(cakeEscapes === 5) {
+                document.getElementById('cake-hint').style.display = 'block';
+            }
+        }
+        function catchCake() { document.getElementById('runaway-cake').style.display='none'; document.getElementById('cake-hint').style.display='none'; openAlert("🎂 생일 축하해! 🎂"); }
+        function handleEasterEgg() { const now=new Date().getTime(); if(now-lastClick<800) eggClick++; else eggClick=1; lastClick=now; if(eggClick===3){ document.getElementById('secret-letter').style.display='block'; eggClick=0; } }
+    </script>
+</body>
+</html>
