@@ -153,7 +153,7 @@
         <div onclick="handleEasterEgg()" style="position:absolute; top:0; left:0; width:100px; height:100px; z-index:100;"></div>
         <div id="runaway-cake" onmouseover="moveCake()" ontouchstart="moveCake()" onclick="catchCake()">🎂</div>
         <div id="cake-hint" style="display:none; position:absolute; bottom:30px; left:0; width:100%; text-align:center; font-size:14px; color:var(--ios-gray); pointer-events:none;">힌트 : 도움이 필요하신가요?<br>'010-5370-0637' 으로 연락주세요</div>
-        <div id="secret-letter"><p>자기야🥰<br>생일축하해!<br>재미있었다면 좋겠어 ㅎㅎ<b>지금 고개를 들어 앞을 봐줘!</b></p></div>
+        <div id="secret-letter"><p>선아야 🥰<br>생일축하해 🎉🥳<br>방탈출 느낌을 내봤는데 재미있었다면 좋겠어 ㅎㅎ<br>지금 고개를 들어 앞을 봐줘!</b></p></div>
     </div>
 
     <div id="alert-box">
@@ -192,7 +192,7 @@
             if(document.getElementById(`q-input-${n}`).value.trim().toUpperCase() === ans) {
                 solved[n-1] = true; document.getElementById(`quiz-app-${n}`).style.display='none';
                 document.getElementById(`err${n}`).classList.add('resolved');
-                if(solved.every(v=>v)) openAlert("To. 선아<br>happy birthday!<br>from. 준영", () => { openAlert("복구 완료!", ()=>{ document.getElementById('admin-mode').style.display='none'; document.getElementById('cake-stage').style.display='block'; }); });
+                if(solved.every(v=>v)) openAlert("To. 선아<br>happy birthday!<br>from. 준영", () => { openAlert("복구 완료<br>케이크를 잡아주세요", ()=>{ document.getElementById('admin-mode').style.display='none'; document.getElementById('cake-stage').style.display='block'; }); });
             } else alert("다시 확인해 주세요.");
         }
         
