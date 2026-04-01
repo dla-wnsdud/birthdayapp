@@ -112,7 +112,7 @@
     <div id="quiz-app-1" class="quiz-app">
         <div class="quiz-header"><span style="font-weight:700; font-size:22px;">사진</span></div>
         <div class="quiz-content" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; text-align:center;">
-            <div><div class="photo-box" style="background:#f2f2f7; aspect-ratio:1; border-radius:8px; margin-bottom:5px; display:flex; justify-content:center; align-items:center; overflow:hidden;"><img src="cute_Shadows.JPG" style="width:100%; height:100%; object-fit:cover;">cute_Shadows.jpg</div></div>
+            <div><div class="photo-box" style="background:#f2f2f7; aspect-ratio:1; border-radius:8px; margin-bottom:5px; display:flex; justify-content:center; align-items:center; overflow:hidden;"><img src="cute_Shadows.JPG" style="width:100%; height:100%; object-fit:cover;"></div><div style="font-size:11px; color:#555;">cute_Shadows.jpg</div></div>
             <div><div class="photo-box" style="background:#f2f2f7; aspect-ratio:1; border-radius:8px; margin-bottom:5px; display:flex; justify-content:center; align-items:center; overflow:hidden;">사진2</div><div style="font-size:11px; color:#555;">date_E.png</div></div>
             <div><div class="photo-box" style="background:#f2f2f7; aspect-ratio:1; border-radius:8px; margin-bottom:5px; display:flex; justify-content:center; align-items:center; overflow:hidden;">사진3</div><div style="font-size:11px; color:#555;">snap_O.gif</div></div>
             <div><div class="photo-box" style="background:#f2f2f7; aspect-ratio:1; border-radius:8px; margin-bottom:5px; display:flex; justify-content:center; align-items:center; overflow:hidden;">사진4</div><div style="font-size:11px; color:#555;">file_N.webp</div></div>
@@ -152,8 +152,8 @@
     <div id="cake-stage">
         <div onclick="handleEasterEgg()" style="position:absolute; top:0; left:0; width:100px; height:100px; z-index:100;"></div>
         <div id="runaway-cake" onmouseover="moveCake()" ontouchstart="moveCake()" onclick="catchCake()">🎂</div>
-        <div id="cake-hint" style="display:none; position:absolute; bottom:30px; left:0; width:100%; text-align:center; font-size:14px; color:var(--ios-gray); pointer-events:none;">힌트 : 도움이 필요하신가요?<br>010-0000-0000 으로 연락주세요</div>
-        <div id="secret-letter"><p>자기야 💌<br>생일축하해!<br>재미있었다면 좋겠어 ㅎㅎ<b>지금 고개를 들어 앞을 봐줘!</b></p></div>
+        <div id="cake-hint" style="display:none; position:absolute; bottom:30px; left:0; width:100%; text-align:center; font-size:14px; color:var(--ios-gray); pointer-events:none;">힌트 : 도움이 필요하신가요?<br>'010-5370-0637' 으로 연락주세요</div>
+        <div id="secret-letter"><p>자기야🥰<br>생일축하해!<br>재미있었다면 좋겠어 ㅎㅎ<b>지금 고개를 들어 앞을 봐줘!</b></p></div>
     </div>
 
     <div id="alert-box">
@@ -162,7 +162,7 @@
     </div>
 
     <script>
-        const logs = ["패키지 분해 중...", "강선아 예쁨 감지 완료", "귀여움 인증 중...", "설치 완료!"];
+        const logs = ["패키지 분해 중...", "예쁨 감지 완료", "귀여움 인증 중...", "설치 완료!"];
         let solved = [false, false, false, false];
         let cakeEscapes = 0, eggClick = 0, lastClick = 0;
         let isGameOver = false;
@@ -186,7 +186,7 @@
             }, 800);
         }
         function openAlert(msg, cb) { document.getElementById('alert-msg').innerHTML = msg; document.getElementById('alert-box').style.display='block'; document.getElementById('alert-confirm-btn').onclick=()=>{ document.getElementById('alert-box').style.display='none'; if(cb) cb(); }; }
-        function showInitialAlert() { openAlert("!오류발생!<br>관리자 모드 복구가 필요합니다.", () => { document.getElementById('home-screen').style.display='none'; document.getElementById('admin-mode').style.display='flex'; }); }
+        function showInitialAlert() { openAlert("🚨 오류발생 🚨<br>관리자 모드 복구가 필요합니다.", () => { document.getElementById('home-screen').style.display='none'; document.getElementById('admin-mode').style.display='flex'; }); }
         function openQuiz(n) { if(solved[n-1]) return; document.getElementById(`quiz-app-${n}`).style.display='flex'; if(n===3) startDinoGame(); }
         function checkQuiz(n, ans) {
             if(document.getElementById(`q-input-${n}`).value.trim().toUpperCase() === ans) {
@@ -218,7 +218,7 @@
                 obstacles.forEach(o=>{ 
                     o.x-=5; 
                     ctx.font="24px Arial"; ctx.fillText("🌵", o.x, 130); 
-                    ctx.font="16px Arial"; ctx.fillStyle="red"; ctx.fillText(o.char, o.x+5, 100); ctx.fillStyle="black"; 
+                    ctx.font="16px Arial"; ctx.fillStyle="green"; ctx.fillText(o.char, o.x+5, 100); ctx.fillStyle="black"; 
                     
                     // 충돌 판정 (공룡이 선인장에 닿았을 때)
                     if(o.x < 45 && o.x + 20 > 20 && dinoY > 106) {
