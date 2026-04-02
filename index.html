@@ -252,7 +252,7 @@
                 document.getElementById('cake-hint').style.display = 'block';
             }
         }
-        function catchCake() { document.getElementById('runaway-cake').style.display='none'; document.getElementById('cake-hint').style.display='none'; openAlert("🎂 생일 축하해! 🎂"); }
+        function catchCake() {moveCake();}
         function handleEasterEgg() { const now=new Date().getTime(); if(now-lastClick<800) eggClick++; else eggClick=1; lastClick=now; if(eggClick===3){ document.getElementById('secret-letter').style.display='block'; eggClick=0; } }
     </script>
 </body>
